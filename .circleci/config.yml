@@ -1,3 +1,12 @@
+aliases:
+  - &restore-cache
+    keys:
+    - v1-dependencies-{{ checksum "build.gradle" }}
+    - v1-dependencies-
+  - &save-cache
+    paths:
+       - ~/.gradle
+    key: v1-dependencies-{{ checksum "build.gradle" }}
 version: 2
 jobs:
   build:
@@ -18,17 +27,8 @@ jobs:
 
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.gradle" }}
-            - v1-dependencies-
-
+      - restore_cache: *restore-cache
       - run: gradle dependencies
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
+      - save_cache: *save-cache
       - run: ./gradlew test
       - run: ./gradlew bootJar
