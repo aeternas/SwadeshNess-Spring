@@ -45,8 +45,9 @@ jobs:
       - restore_cache: *restore-cache
       - run: gradle dependencies
       - save_cache: *save-cache
+      - store_artifacts:
+          path: build/libs/SwadeshNess-Application-0.0.1.jar
       - *setup_remote_docker
       - run: *test
       - run: *make_executable
-      - run: pwd & ls -lia
       - deploy: *containerize_push
