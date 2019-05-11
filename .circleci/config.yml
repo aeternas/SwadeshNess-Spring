@@ -48,4 +48,5 @@ jobs:
       - *setup_remote_docker
       - run: *test
       - run: *make_executable
+      - run: pwd & ls -lia
       - deploy: *containerize_push
