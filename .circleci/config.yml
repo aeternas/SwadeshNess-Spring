@@ -41,7 +41,5 @@ jobs:
       - save_cache: *save-cache
       - run: *test
       - run: *make_executable
-      - store_artifacts:
-          path: build/libs/swadeshness-0.0.1-SNAPSHOT.jar
       - *setup_remote_docker
       - deploy: *containerize_push
