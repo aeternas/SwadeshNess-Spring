@@ -13,6 +13,12 @@ aliases:
   - &make_executable
     name: Make Jar Executable
     command: ./gradlew bootJar
+  - &containerize_push
+    name: Containerize and Push
+    command: |
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && \
+      docker build -t aeternas/swadeshness-spring:$CIRCLE_BRANCH . && \
+      docker push aeternas/swadeshness-spring:$CIRCLE_BRANCH
 version: 2
 jobs:
   build:
@@ -38,3 +44,4 @@ jobs:
       - save_cache: *save-cache
       - run: *test
       - run: *make_executable
+      - deploy: *containerize_push
