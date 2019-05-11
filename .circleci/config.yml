@@ -7,6 +7,12 @@ aliases:
     paths:
        - ~/.gradle
     key: v1-dependencies-{{ checksum "build.gradle" }}
+  - &test
+    name: Gradle Test
+    command: ./gradlew test
+  - &make_executable
+    name: Make Jar Executable
+    command: ./gradlew bootJar
 version: 2
 jobs:
   build:
@@ -30,5 +36,5 @@ jobs:
       - restore_cache: *restore-cache
       - run: gradle dependencies
       - save_cache: *save-cache
-      - run: ./gradlew test
-      - run: ./gradlew bootJar
+      - *test
+      - *make_executable
