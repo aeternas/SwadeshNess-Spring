@@ -36,5 +36,5 @@ jobs:
       - restore_cache: *restore-cache
       - run: gradle dependencies
       - save_cache: *save-cache
-      - *test
-      - *make_executable
+      - run: *test
+      - run: *make_executable
