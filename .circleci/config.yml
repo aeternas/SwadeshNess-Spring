@@ -47,6 +47,7 @@ jobs:
       - save_cache: *save-cache
       - run: *test
       - run: *make_executable
+      - run: ls build/libs
       - store_artifacts:
           path: build/libs/SwadeshNess-Application-0.0.1.jar
       - *setup_remote_docker
