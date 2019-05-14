@@ -43,5 +43,5 @@ jobs:
       - save_cache: *save-cache
       - run: *gradle-test
       - run: *make-executable
-      - *setup-remote_docker
+      - *setup-remote-docker
       - deploy: *containerize-push
