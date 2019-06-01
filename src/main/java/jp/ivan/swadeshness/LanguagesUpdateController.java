@@ -2,6 +2,7 @@ package jp.ivan.swadeshness;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
@@ -40,7 +41,24 @@ public class LanguagesUpdateController {
         out.write(word);
         out.close();
         git.commit().setAll(true).setMessage("test commit").call();
-        SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+
+        PushCommand pushCommand = git
+                .push()
+                .setTransportConfigCallback( new TransportConfigCallback() {
+            @Override
+            public void configure(Transport transport) {
+                SshTransport sshTransport = ( SshTransport )transport;
+                sshTransport.setSshSessionFactory( getSessionFactory() );
+            }
+        });
+
+        pushCommand.call();
+
+        return "Words list is updated with word";
+    }
+
+    private SshSessionFactory getSessionFactory() {
+        return new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session) {
                 session.setPassword("password");
@@ -53,25 +71,20 @@ public class LanguagesUpdateController {
                 return defaultJSch;
             }
         };
-        PushCommand pushCommand = git
-                .push()
-                .setTransportConfigCallback( new TransportConfigCallback() {
-            @Override
-            public void configure(Transport transport) {
-                SshTransport sshTransport = ( SshTransport )transport;
-                sshTransport.setSshSessionFactory( sshSessionFactory );
-            }
-        });
-
-        pushCommand.call();
-
-        return "Words list is updated with word";
     }
 
     private Git createRepo() throws GitAPIException {
-        return Git.cloneRepository()
+        CloneCommand cloneCommand = Git
+                .cloneRepository()
                 .setURI( "ssh://git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setDirectory(new File("sw2"))
-                .call();
+                .setTransportConfigCallback(new TransportConfigCallback() {
+                    @Override
+                    public void configure(Transport transport) {
+                        SshTransport sshTransport = ( SshTransport )transport;
+                        sshTransport.setSshSessionFactory( getSessionFactory() );
+                    }
+                });
+        return cloneCommand.call();
     }
 }
