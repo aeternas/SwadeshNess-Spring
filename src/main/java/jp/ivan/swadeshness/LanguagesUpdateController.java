@@ -37,7 +37,7 @@ public class LanguagesUpdateController {
         Git git;
         if (file.exists()) {
             git = Git.open(file);
-            git.checkout().setName(branch).call();
+            git.checkout().setName("refs/heads" + branch).call();
             git.pull().call();
         } else {
             git = createRepo();
@@ -85,10 +85,12 @@ public class LanguagesUpdateController {
     }
 
     private Git createRepo() throws GitAPIException {
+        String branch = env.getProperty("words.git.branch");
         CloneCommand cloneCommand = Git
                 .cloneRepository()
                 .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setCloneAllBranches( true )
+                .setBranch("refs/heads" + branch)
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
