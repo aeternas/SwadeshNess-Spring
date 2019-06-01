@@ -38,9 +38,9 @@ public class LanguagesUpdateController {
         }
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("./sw2/words/", true));
-        out.write(word);
+        out.write("\n" + word);
         out.close();
-        git.commit().setAll(true).setMessage("test commit").call();
+        git.commit().setAll(true).setMessage("Updated words list").call();
 
         PushCommand pushCommand = git
                 .push()
@@ -60,9 +60,7 @@ public class LanguagesUpdateController {
     private SshSessionFactory getSessionFactory() {
         return new JschConfigSessionFactory() {
             @Override
-            protected void configure(OpenSshConfig.Host host, Session session) {
-                session.setPassword("4f7eedd6b29b999ab6eb40c75af680151ff11e1d");
-            }
+            protected void configure(OpenSshConfig.Host host, Session session) { }
 
             @Override
             protected JSch createDefaultJSch(FS fs) throws JSchException {
@@ -76,7 +74,7 @@ public class LanguagesUpdateController {
     private Git createRepo() throws GitAPIException {
         CloneCommand cloneCommand = Git
                 .cloneRepository()
-                .setURI( "ssh://aeternas@github.com/SwadeshNess-words-list.git" )
+                .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
