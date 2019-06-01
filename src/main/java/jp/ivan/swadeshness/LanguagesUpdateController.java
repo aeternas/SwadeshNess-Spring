@@ -88,6 +88,7 @@ public class LanguagesUpdateController {
         CloneCommand cloneCommand = Git
                 .cloneRepository()
                 .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
+                .setCloneAllBranches( true )
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
