@@ -60,7 +60,9 @@ public class LanguagesUpdateController {
     private SshSessionFactory getSessionFactory() {
         return new JschConfigSessionFactory() {
             @Override
-            protected void configure(OpenSshConfig.Host host, Session session) { }
+            protected void configure(OpenSshConfig.Host host, Session session) {
+                session.setConfig("StrictHostKeyChecking", "no");
+            }
 
             @Override
             protected JSch createDefaultJSch(FS fs) throws JSchException {
