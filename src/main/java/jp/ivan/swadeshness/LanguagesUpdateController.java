@@ -61,7 +61,7 @@ public class LanguagesUpdateController {
         return new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session) {
-                session.setPassword("password");
+                session.setPassword("4f7eedd6b29b999ab6eb40c75af680151ff11e1d");
             }
 
             @Override
@@ -76,7 +76,7 @@ public class LanguagesUpdateController {
     private Git createRepo() throws GitAPIException {
         CloneCommand cloneCommand = Git
                 .cloneRepository()
-                .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
+                .setURI( "ssh://aeternas@github.com/SwadeshNess-words-list.git" )
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
