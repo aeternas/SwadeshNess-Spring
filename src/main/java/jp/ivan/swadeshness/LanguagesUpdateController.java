@@ -11,6 +11,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
 import com.jcraft.jsch.*;
 import org.eclipse.jgit.util.FS;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,18 +23,25 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+
 @RestController
 public class LanguagesUpdateController {
 
+    @Autowired
+    private Environment env;
+
     @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
     public String index(@PathVariable String word) throws GitAPIException, IOException {
+        String branch = env.getProperty("words.git.branch");
         File file = new File("./sw2");
         Git git;
         if (file.exists()) {
             git = Git.open(file);
-            git.fetch().call();
+            git.checkout().setName(branch).call();
+            git.pull().call();
         } else {
             git = createRepo();
+            git.checkout().setName(branch).call();
         }
         if (git == null) {
             return "Error while creating git repo";
