@@ -38,7 +38,7 @@ public class LanguagesUpdateController {
         }
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("./sw2/words/", true));
-        out.write("\n" + word);
+        out.write(word);
         out.close();
         git.commit().setAll(true).setMessage("Updated words list").call();
 
