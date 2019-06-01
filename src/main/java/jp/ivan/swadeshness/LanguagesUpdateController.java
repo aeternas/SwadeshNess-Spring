@@ -76,7 +76,7 @@ public class LanguagesUpdateController {
     private Git createRepo() throws GitAPIException {
         CloneCommand cloneCommand = Git
                 .cloneRepository()
-                .setURI( "ssh://git@github.com:aeternas/SwadeshNess-words-list.git" )
+                .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
