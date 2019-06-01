@@ -30,6 +30,7 @@ public class LanguagesUpdateController {
         Git git;
         if (file.exists()) {
             git = Git.open(file);
+            git.fetch().call();
         } else {
             git = createRepo();
         }
