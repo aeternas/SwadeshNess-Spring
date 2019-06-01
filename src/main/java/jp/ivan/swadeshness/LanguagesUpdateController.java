@@ -1,7 +1,15 @@
 package jp.ivan.swadeshness;
 
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.*;
+import com.jcraft.jsch.*;
+import org.eclipse.jgit.util.FS;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +40,28 @@ public class LanguagesUpdateController {
         out.write(word);
         out.close();
         git.commit().setAll(true).setMessage("test commit").call();
-        git.push().call();
+        SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(OpenSshConfig.Host host, Session session) {
+                session.setPassword("password");
+            }
+
+            @Override
+            protected JSch createDefaultJSch(FS fs) throws JSchException {
+                JSch defaultJSch = super.createDefaultJSch(fs);
+                defaultJSch.addIdentity("/root/.ssh/id_rsa");
+                return defaultJSch;
+            }
+        };
+        PushCommand pushCommand = git.push().setTransportConfigCallback( new TransportConfigCallback() {
+            @Override
+            public void configure(Transport transport) {
+                SshTransport sshTransport = ( SshTransport )transport;
+                sshTransport.setSshSessionFactory( sshSessionFactory );
+            }
+        });
+
+        pushCommand.call();
 
         return "Words list is updated with word";
     }
