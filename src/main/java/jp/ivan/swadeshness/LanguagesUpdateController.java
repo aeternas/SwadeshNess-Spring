@@ -53,7 +53,9 @@ public class LanguagesUpdateController {
                 return defaultJSch;
             }
         };
-        PushCommand pushCommand = git.push().setTransportConfigCallback( new TransportConfigCallback() {
+        PushCommand pushCommand = git
+                .push()
+                .setTransportConfigCallback( new TransportConfigCallback() {
             @Override
             public void configure(Transport transport) {
                 SshTransport sshTransport = ( SshTransport )transport;
@@ -68,7 +70,7 @@ public class LanguagesUpdateController {
 
     private Git createRepo() throws GitAPIException {
         return Git.cloneRepository()
-                .setURI( "https://github.com/aeternas/SwadeshNess-words-list.git" )
+                .setURI( "ssh://git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setDirectory(new File("sw2"))
                 .call();
     }
