@@ -37,8 +37,16 @@ public class LanguagesUpdateController {
         Git git;
         if (file.exists()) {
             git = Git.open(file);
-            git.checkout().setName("refs/heads" + branch).call();
-            git.pull().call();
+            git.checkout().setName("refs/heads/" + branch).call();
+            git.pull()
+                    .setTransportConfigCallback(new TransportConfigCallback() {
+                        @Override
+                        public void configure(Transport transport) {
+                            SshTransport sshTransport = ( SshTransport )transport;
+                            sshTransport.setSshSessionFactory( getSessionFactory() );
+                        }
+                    })
+                    .call();
         } else {
             git = createRepo();
             git.checkout().setName(branch).call();
@@ -90,7 +98,7 @@ public class LanguagesUpdateController {
                 .cloneRepository()
                 .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
                 .setCloneAllBranches( true )
-                .setBranch("refs/heads" + branch)
+                .setBranch("refs/heads/" + branch)
                 .setDirectory(new File("sw2"))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
