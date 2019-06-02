@@ -26,6 +26,11 @@ public class GitServiceImpl implements GitService {
     private static final String WORDS_FILE = "/words";
     private static final String REFS_PREFIX= "refs/heads/";
 
+    @Override
+    public void setEnv(Environment env) {
+        this.env = env;
+    }
+
     @Autowired
     private Environment env;
 
