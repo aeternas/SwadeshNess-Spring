@@ -10,21 +10,47 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+
+@Service
 public class GitServiceImpl implements GitService {
-
     private static final String WORDS_GIT_ENV = "words.git.branch";
     private static final String GIT_URI = "git@github.com:aeternas/SwadeshNess-words-list.git";
     private static final String WORDS_REPO_DIR = "words-list";
     private static final String WORDS_FILE = "/words";
     private static final String REFS_PREFIX= "refs/heads/";
+
+    Logger logger = LoggerFactory.getLogger(GitServiceImpl.class);
+
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
+    private ExecutorService executor;
+
+    private ExecutorService getTaskExecutor() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        return executor;
+    }
 
     @Override
     public void setEnv(Environment env) {
@@ -35,26 +61,46 @@ public class GitServiceImpl implements GitService {
     private Environment env;
 
     @Override
-    public void pushAll(String message) throws IOException, GitAPIException {
-        Git git = getRepo();
-        BufferedWriter out = new BufferedWriter(
-                new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
-        out.newLine();
-        out.write(message);
-        out.close();
-        git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
+    public void pushAll(String message) throws IOException, GitAPIException, ExecutionException, InterruptedException {
+        ExecutorService executor = getTaskExecutor();
+        logger.error("Executor allocated");
+        PushTask task = new PushTask();
+        task.setMessage(message);
+        if (executor != null) {
+            executor.submit(task).get();
+        }
+    }
 
-        PushCommand pushCommand = git
-                .push()
-                .setTransportConfigCallback( new TransportConfigCallback() {
-                    @Override
-                    public void configure(Transport transport) {
-                        SshTransport sshTransport = ( SshTransport )transport;
-                        sshTransport.setSshSessionFactory( getSessionFactory() );
-                    }
-                });
+    private class PushTask implements Callable<Void> {
+        private String message;
 
-        pushCommand.call();
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            Git git = getRepo();
+            BufferedWriter out = new BufferedWriter(
+                    new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
+            out.newLine();
+            out.write(message);
+            out.close();
+            git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
+
+            PushCommand pushCommand = git
+                    .push()
+                    .setTransportConfigCallback( new TransportConfigCallback() {
+                        @Override
+                        public void configure(Transport transport) {
+                            SshTransport sshTransport = ( SshTransport )transport;
+                            sshTransport.setSshSessionFactory( getSessionFactory() );
+                        }
+                    });
+
+            pushCommand.call();
+            return null;
+        }
     }
 
     private void cloneRepo() throws GitAPIException {

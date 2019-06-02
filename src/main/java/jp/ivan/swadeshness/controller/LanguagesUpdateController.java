@@ -11,21 +11,35 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 @RestController
 public class LanguagesUpdateController {
 
     public GitService gitService;
+    private ExecutorService executor;
 
     @Autowired
     private Environment env;
 
     @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
-    public String index(@PathVariable String word) throws GitAPIException, IOException {
-        gitService = new GitServiceImpl();
-        gitService.setEnv(env);
+    public String index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+        if (gitService == null) {
+            gitService = new GitServiceImpl();
+            gitService.setExecutor(getTaskExecutor());
+            gitService.setEnv(env);
+        }
         gitService.pushAll(word);
-        return "Words list is updated with word";
+        return "Words list is updated with word" + word;
+    }
+
+    private ExecutorService getTaskExecutor() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+        }
+        return executor;
     }
 }
