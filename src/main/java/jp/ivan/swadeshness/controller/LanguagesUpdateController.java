@@ -24,7 +24,7 @@ public class LanguagesUpdateController {
     @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
     public String index(@PathVariable String word) throws GitAPIException, IOException {
         gitService = new GitServiceImpl();
-//        gitService.setEnv(env);
+        gitService.setEnv(env);
         gitService.pushAll(word);
         return "Words list is updated with word";
     }
