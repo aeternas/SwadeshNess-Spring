@@ -1,31 +1,25 @@
-package jp.ivan.swadeshness;
+package jp.ivan.swadeshness.service;
 
+import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
-import com.jcraft.jsch.*;
 import org.eclipse.jgit.util.FS;
+import org.jetbrains.annotations.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.BufferedWriter;
 import java.io.IOException;
 
-
-@RestController
-public class LanguagesUpdateController {
+public class GitServiceImpl implements GitService {
 
     private static final String WORDS_GIT_ENV = "words.git.branch";
     private static final String GIT_URI = "git@github.com:aeternas/SwadeshNess-words-list.git";
@@ -36,8 +30,48 @@ public class LanguagesUpdateController {
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
-    public String index(@PathVariable String word) throws GitAPIException, IOException {
+    @Override
+    public void pushAll(String message) throws IOException, GitAPIException {
+        Git git = getRepo();
+        BufferedWriter out = new BufferedWriter(
+                new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
+        out.newLine();
+        out.write(message);
+        out.close();
+        git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
+
+        PushCommand pushCommand = git
+                .push()
+                .setTransportConfigCallback( new TransportConfigCallback() {
+                    @Override
+                    public void configure(Transport transport) {
+                        SshTransport sshTransport = ( SshTransport )transport;
+                        sshTransport.setSshSessionFactory( getSessionFactory() );
+                    }
+                });
+
+        pushCommand.call();
+    }
+
+    private void cloneRepo() throws GitAPIException {
+        String branch = env.getProperty(WORDS_GIT_ENV);
+        CloneCommand cloneCommand = Git
+                .cloneRepository()
+                .setURI( GIT_URI )
+                .setCloneAllBranches( true )
+                .setBranch(REFS_PREFIX + branch)
+                .setDirectory(new File(WORDS_REPO_DIR))
+                .setTransportConfigCallback(new TransportConfigCallback() {
+                    @Override
+                    public void configure(Transport transport) {
+                        SshTransport sshTransport = ( SshTransport )transport;
+                        sshTransport.setSshSessionFactory( getSessionFactory() );
+                    }
+                });
+        cloneCommand.call();
+    }
+
+    private Git getRepo() throws IOException, GitAPIException {
         String branch = env.getProperty(WORDS_GIT_ENV);
         File file = new File(WORDS_REPO_DIR);
         Git git;
@@ -54,34 +88,14 @@ public class LanguagesUpdateController {
                     })
                     .call();
         } else {
-            git = createRepo();
+            cloneRepo();
+            git = Git.open(file);
             git.checkout().setName(branch).call();
         }
-        if (git == null) {
-            return "Error while creating git repo";
-        }
-        BufferedWriter out = new BufferedWriter(
-                new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
-        out.newLine();
-        out.write(word);
-        out.close();
-        git.commit().setAll(true).setMessage("Updated words list with word " + word).call();
-
-        PushCommand pushCommand = git
-                .push()
-                .setTransportConfigCallback( new TransportConfigCallback() {
-            @Override
-            public void configure(Transport transport) {
-                SshTransport sshTransport = ( SshTransport )transport;
-                sshTransport.setSshSessionFactory( getSessionFactory() );
-            }
-        });
-
-        pushCommand.call();
-
-        return "Words list is updated with word";
+        return git;
     }
 
+    @Contract(value = " -> new", pure = true)
     private SshSessionFactory getSessionFactory() {
         return new JschConfigSessionFactory() {
             @Override
@@ -96,23 +110,5 @@ public class LanguagesUpdateController {
                 return defaultJSch;
             }
         };
-    }
-
-    private Git createRepo() throws GitAPIException {
-        String branch = env.getProperty(WORDS_GIT_ENV);
-        CloneCommand cloneCommand = Git
-                .cloneRepository()
-                .setURI( GIT_URI )
-                .setCloneAllBranches( true )
-                .setBranch(REFS_PREFIX + branch)
-                .setDirectory(new File(WORDS_REPO_DIR))
-                .setTransportConfigCallback(new TransportConfigCallback() {
-                    @Override
-                    public void configure(Transport transport) {
-                        SshTransport sshTransport = ( SshTransport )transport;
-                        sshTransport.setSshSessionFactory( getSessionFactory() );
-                    }
-                });
-        return cloneCommand.call();
     }
 }
