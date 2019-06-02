@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 @RestController
 public class LanguagesUpdateController {
 
-    public GitService gitService;
+    private GitService gitService;
     private ExecutorService executor;
 
     @Autowired
@@ -27,19 +27,26 @@ public class LanguagesUpdateController {
 
     @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
     public String index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
-        if (gitService == null) {
-            gitService = new GitServiceImpl();
-            gitService.setExecutor(getTaskExecutor());
-            gitService.setEnv(env);
-        }
+        gitService = getGitService();
         gitService.pushAll(word);
         return "Words list is updated with word" + word;
     }
 
     private ExecutorService getTaskExecutor() {
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
+        if (executor != null) {
+            return executor;
         }
+        executor = Executors.newSingleThreadExecutor();
         return executor;
+    }
+
+    private GitService getGitService() {
+        if (gitService != null) {
+            return gitService;
+        }
+        gitService = new GitServiceImpl();
+        gitService.setExecutor(getTaskExecutor());
+        gitService.setEnv(env);
+        return gitService;
     }
 }
