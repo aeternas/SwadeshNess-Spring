@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 @Service
@@ -65,7 +66,7 @@ public class GitServiceImpl implements GitService {
         PushTask task = new PushTask();
         task.setMessage(message);
         executor.submit(task);
-        executor.shutdown();
+//        executor.shutdown();
     }
 
     private class PushTask implements Callable<Void> {
