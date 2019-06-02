@@ -27,17 +27,23 @@ import java.io.IOException;
 @RestController
 public class LanguagesUpdateController {
 
+    private static final String WORDS_GIT_ENV = "words.git.branch";
+    private static final String GIT_URI = "git@github.com:aeternas/SwadeshNess-words-list.git";
+    private static final String WORDS_REPO_DIR = "words-list";
+    private static final String WORDS_FILE = "/words";
+    private static final String REFS_PREFIX= "refs/heads/";
+
     @Autowired
     private Environment env;
 
     @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
     public String index(@PathVariable String word) throws GitAPIException, IOException {
-        String branch = env.getProperty("words.git.branch");
-        File file = new File("./sw2");
+        String branch = env.getProperty(WORDS_GIT_ENV);
+        File file = new File(WORDS_REPO_DIR);
         Git git;
         if (file.exists()) {
             git = Git.open(file);
-            git.checkout().setName("refs/heads/" + branch).call();
+            git.checkout().setName(REFS_PREFIX + branch).call();
             git.pull()
                     .setTransportConfigCallback(new TransportConfigCallback() {
                         @Override
@@ -55,11 +61,11 @@ public class LanguagesUpdateController {
             return "Error while creating git repo";
         }
         BufferedWriter out = new BufferedWriter(
-                new FileWriter("./sw2/words/", true));
+                new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
         out.newLine();
         out.write(word);
         out.close();
-        git.commit().setAll(true).setMessage("Updated words list").call();
+        git.commit().setAll(true).setMessage("Updated words list with word " + word).call();
 
         PushCommand pushCommand = git
                 .push()
@@ -93,13 +99,13 @@ public class LanguagesUpdateController {
     }
 
     private Git createRepo() throws GitAPIException {
-        String branch = env.getProperty("words.git.branch");
+        String branch = env.getProperty(WORDS_GIT_ENV);
         CloneCommand cloneCommand = Git
                 .cloneRepository()
-                .setURI( "git@github.com:aeternas/SwadeshNess-words-list.git" )
+                .setURI( GIT_URI )
                 .setCloneAllBranches( true )
-                .setBranch("refs/heads/" + branch)
-                .setDirectory(new File("sw2"))
+                .setBranch(REFS_PREFIX + branch)
+                .setDirectory(new File(WORDS_REPO_DIR))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
                     public void configure(Transport transport) {
