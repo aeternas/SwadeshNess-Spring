@@ -65,7 +65,11 @@ public class GitServiceImpl implements GitService {
         logger.error("Executor allocated");
         PushTask task = new PushTask();
         task.setMessage(message);
-        executor.submit(task);
+        if (executor == null) {
+            logger.error("Executor is null");
+        } else {
+            executor.submit(task);
+        }
 //        executor.shutdown();
     }
 
