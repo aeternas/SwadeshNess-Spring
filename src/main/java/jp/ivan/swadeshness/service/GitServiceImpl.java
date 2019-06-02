@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -60,13 +61,13 @@ public class GitServiceImpl implements GitService {
     private Environment env;
 
     @Override
-    public void pushAll(String message) throws IOException, GitAPIException {
+    public void pushAll(String message) throws IOException, GitAPIException, ExecutionException, InterruptedException {
         ExecutorService executor = getTaskExecutor();
         logger.error("Executor allocated");
         PushTask task = new PushTask();
         task.setMessage(message);
         if (executor != null) {
-            executor.submit(task);
+            executor.submit(task).get();
         }
     }
 
