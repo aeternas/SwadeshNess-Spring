@@ -10,7 +10,6 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
-import org.jetbrains.annotations.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
@@ -95,7 +94,6 @@ public class GitServiceImpl implements GitService {
         return git;
     }
 
-    @Contract(value = " -> new", pure = true)
     private SshSessionFactory getSessionFactory() {
         return new JschConfigSessionFactory() {
             @Override
