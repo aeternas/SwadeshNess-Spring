@@ -7,6 +7,6 @@ import org.springframework.core.env.Environment;
 import java.io.IOException;
 
 public interface GitService {
-    void setEnv(Environment env);
+//    void setEnv(Environment env);
     void pushAll(String message) throws IOException, GitAPIException;
 }

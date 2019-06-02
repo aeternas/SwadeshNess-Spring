@@ -12,12 +12,14 @@ import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Service
 public class GitServiceImpl implements GitService {
 
     private static final String WORDS_GIT_ENV = "words.git.branch";
@@ -26,10 +28,10 @@ public class GitServiceImpl implements GitService {
     private static final String WORDS_FILE = "/words";
     private static final String REFS_PREFIX= "refs/heads/";
 
-    @Override
-    public void setEnv(Environment env) {
-        this.env = env;
-    }
+//    @Override
+//    public void setEnv(Environment env) {
+//        this.env = env;
+//    }
 
     @Autowired
     private Environment env;
