@@ -26,12 +26,10 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 
 @Service
 public class GitServiceImpl implements GitService {
-
     private static final String WORDS_GIT_ENV = "words.git.branch";
     private static final String GIT_URI = "git@github.com:aeternas/SwadeshNess-words-list.git";
     private static final String WORDS_REPO_DIR = "words-list";
@@ -40,17 +38,17 @@ public class GitServiceImpl implements GitService {
 
     Logger logger = LoggerFactory.getLogger(GitServiceImpl.class);
 
-    private static ExecutorService executor;
+    public void setExecutor(ExecutorService executor) {
+        this.executor = executor;
+    }
+
+    private ExecutorService executor;
 
     private ExecutorService getTaskExecutor() {
-        if (GitServiceImpl.executor == null) {
-            logger.error("Creating new executor");
-            GitServiceImpl.executor = Executors.newSingleThreadExecutor();
-        } else {
-            logger.error("Using existing executor");
-            return GitServiceImpl.executor;
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
         }
-        return GitServiceImpl.executor;
+        return executor;
     }
 
     @Override
@@ -67,12 +65,9 @@ public class GitServiceImpl implements GitService {
         logger.error("Executor allocated");
         PushTask task = new PushTask();
         task.setMessage(message);
-        if (executor == null) {
-            logger.error("Executor is null");
-        } else {
+        if (executor != null) {
             executor.submit(task);
         }
-        executor.shutdown();
     }
 
     private class PushTask implements Callable<Void> {
