@@ -45,7 +45,7 @@ public class GitServiceImpl implements GitService {
     private ExecutorService getTaskExecutor() {
         if (GitServiceImpl.executor == null) {
             logger.error("Creating new executor");
-            GitServiceImpl.executor= Executors.newSingleThreadExecutor();
+            GitServiceImpl.executor = Executors.newSingleThreadExecutor();
         } else {
             logger.error("Using existing executor");
             return GitServiceImpl.executor;
@@ -72,7 +72,7 @@ public class GitServiceImpl implements GitService {
         } else {
             executor.submit(task);
         }
-//        executor.shutdown();
+        executor.shutdown();
     }
 
     private class PushTask implements Callable<Void> {
