@@ -44,11 +44,13 @@ public class GitServiceImpl implements GitService {
 
     private ExecutorService getTaskExecutor() {
         if (executor == null) {
+            logger.error("Creating new executor");
             executor = Executors.newSingleThreadExecutor();
         } else {
+            logger.error("Using existing executor");
             return executor;
         }
-        return null;
+        return executor;
     }
 
     @Override
