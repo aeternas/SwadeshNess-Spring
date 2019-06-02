@@ -40,17 +40,17 @@ public class GitServiceImpl implements GitService {
 
     Logger logger = LoggerFactory.getLogger(GitServiceImpl.class);
 
-    private ExecutorService executor;
+    private static ExecutorService executor;
 
     private ExecutorService getTaskExecutor() {
-        if (executor == null) {
+        if (GitServiceImpl.executor == null) {
             logger.error("Creating new executor");
-            executor = Executors.newSingleThreadExecutor();
+            GitServiceImpl.executor= Executors.newSingleThreadExecutor();
         } else {
             logger.error("Using existing executor");
-            return executor;
+            return GitServiceImpl.executor;
         }
-        return executor;
+        return GitServiceImpl.executor;
     }
 
     @Override
