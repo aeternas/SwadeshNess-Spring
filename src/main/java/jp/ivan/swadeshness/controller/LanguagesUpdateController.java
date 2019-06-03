@@ -5,10 +5,11 @@ import jp.ivan.swadeshness.service.GitServiceImpl;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -19,27 +20,34 @@ import java.util.concurrent.Executors;
 @RestController
 public class LanguagesUpdateController {
 
-    public GitService gitService;
+    private GitService gitService;
     private ExecutorService executor;
 
     @Autowired
     private Environment env;
 
-    @RequestMapping(value = "/words/{word}", method = RequestMethod.PUT)
-    public String index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
-        if (gitService == null) {
-            gitService = new GitServiceImpl();
-            gitService.setExecutor(getTaskExecutor());
-            gitService.setEnv(env);
-        }
+    @PutMapping(value = "/words/{word}")
+    ResponseEntity<String> index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+        gitService = getGitService();
         gitService.pushAll(word);
-        return "Words list is updated with word" + word;
+        return new ResponseEntity<>("Words list is updated with word" + word, HttpStatus.OK);
     }
 
     private ExecutorService getTaskExecutor() {
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
+        if (executor != null) {
+            return executor;
         }
+        executor = Executors.newSingleThreadExecutor();
         return executor;
+    }
+
+    private GitService getGitService() {
+        if (gitService != null) {
+            return gitService;
+        }
+        gitService = new GitServiceImpl();
+        gitService.setExecutor(getTaskExecutor());
+        gitService.setEnv(env);
+        return gitService;
     }
 }
