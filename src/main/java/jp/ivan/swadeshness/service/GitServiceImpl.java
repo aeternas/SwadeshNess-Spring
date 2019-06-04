@@ -32,6 +32,7 @@ public class GitServiceImpl implements GitService {
     private static final String WORDS_REPO_DIR = "words-list";
     private static final String WORDS_FILE = "/words";
     private static final String REFS_PREFIX= "refs/heads/";
+    private static final String PRIVATE_KEY_PATH="/root/.ssh/id_rsa";
 
     private Logger logger = LoggerFactory.getLogger(GitServiceImpl.class);
 
@@ -43,6 +44,7 @@ public class GitServiceImpl implements GitService {
 
     private ExecutorService getTaskExecutor() {
         if (executor == null) {
+            logger.debug("Creating single thread executor");
             executor = Executors.newSingleThreadExecutor();
         }
         return executor;
@@ -58,10 +60,11 @@ public class GitServiceImpl implements GitService {
     @Override
     public void pushAll(String message) throws IOException, GitAPIException, ExecutionException, InterruptedException {
         ExecutorService executor = getTaskExecutor();
-        logger.error("Executor allocated");
+        logger.debug("Executor retrieved");
         PushTask task = new PushTask();
         task.setMessage(message);
         if (executor != null) {
+            logger.debug("Submitting task");
             executor.submit(task).get();
         }
     }
@@ -82,6 +85,7 @@ public class GitServiceImpl implements GitService {
             out.write(message);
             out.close();
             git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
+            logger.debug("Commit made");
 
             PushCommand pushCommand = git
                     .push()
@@ -114,6 +118,7 @@ public class GitServiceImpl implements GitService {
                     }
                 });
         cloneCommand.call();
+        logger.debug("Repo is cloned");
     }
 
     private Git getRepo() throws IOException, GitAPIException {
@@ -121,6 +126,7 @@ public class GitServiceImpl implements GitService {
         File file = new File(WORDS_REPO_DIR);
         Git git;
         if (file.exists()) {
+            logger.debug("Repo exists, opening");
             git = Git.open(file);
             git.checkout().setName(REFS_PREFIX + branch).call();
             git.pull()
@@ -133,6 +139,7 @@ public class GitServiceImpl implements GitService {
                     })
                     .call();
         } else {
+            logger.debug("Repo doesn't exist, cloning...");
             cloneRepo();
             git = Git.open(file);
             git.checkout().setName(branch).call();
@@ -150,7 +157,7 @@ public class GitServiceImpl implements GitService {
             @Override
             protected JSch createDefaultJSch(FS fs) throws JSchException {
                 JSch defaultJSch = super.createDefaultJSch(fs);
-                defaultJSch.addIdentity("/root/.ssh/id_rsa");
+                defaultJSch.addIdentity(PRIVATE_KEY_PATH);
                 return defaultJSch;
             }
         };
