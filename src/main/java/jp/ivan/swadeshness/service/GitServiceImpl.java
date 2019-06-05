@@ -3,9 +3,9 @@ package jp.ivan.swadeshness.service;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import jp.ivan.swadeshness.models.PushTask;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
@@ -15,22 +15,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 
 
 @Service
 public class GitServiceImpl implements GitService {
     private static final String WORDS_GIT_ENV = "words.git.branch";
     private static final String GIT_URI = "git@github.com:aeternas/SwadeshNess-words-list.git";
-    private static final String WORDS_REPO_DIR = "words-list";
-    private static final String WORDS_FILE = "/words";
+
     private static final String REFS_PREFIX= "refs/heads/";
     private static final String PRIVATE_KEY_PATH="/root/.ssh/id_rsa";
 
@@ -58,47 +55,14 @@ public class GitServiceImpl implements GitService {
     private Environment env;
 
     @Override
-    public void pushAll(String message) throws IOException, GitAPIException, ExecutionException, InterruptedException {
+    public void pushAll(String message) throws ExecutionException, InterruptedException {
         ExecutorService executor = getTaskExecutor();
         logger.debug("Executor retrieved");
-        PushTask task = new PushTask();
+        PushTask task = new PushTask(this);
         task.setMessage(message);
         if (executor != null) {
             logger.debug("Submitting task");
             executor.submit(task).get();
-        }
-    }
-
-    private class PushTask implements Callable<Void> {
-        private String message;
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        @Override
-        public Void call() throws Exception {
-            Git git = getRepo();
-            BufferedWriter out = new BufferedWriter(
-                    new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
-            out.newLine();
-            out.write(message);
-            out.close();
-            git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
-            logger.debug("Commit made");
-
-            PushCommand pushCommand = git
-                    .push()
-                    .setTransportConfigCallback( new TransportConfigCallback() {
-                        @Override
-                        public void configure(Transport transport) {
-                            SshTransport sshTransport = ( SshTransport )transport;
-                            sshTransport.setSshSessionFactory( getSessionFactory() );
-                        }
-                    });
-
-            pushCommand.call();
-            return null;
         }
     }
 
@@ -109,7 +73,7 @@ public class GitServiceImpl implements GitService {
                 .setURI( GIT_URI )
                 .setCloneAllBranches( true )
                 .setBranch(REFS_PREFIX + branch)
-                .setDirectory(new File(WORDS_REPO_DIR))
+                .setDirectory(new File(PushTask.WORDS_REPO_DIR))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
                     public void configure(Transport transport) {
@@ -121,9 +85,10 @@ public class GitServiceImpl implements GitService {
         logger.debug("Repo is cloned");
     }
 
-    private Git getRepo() throws IOException, GitAPIException {
+    @Override
+    public Git getRepo() throws IOException, GitAPIException {
         String branch = env.getProperty(WORDS_GIT_ENV);
-        File file = new File(WORDS_REPO_DIR);
+        File file = new File(PushTask.WORDS_REPO_DIR);
         Git git;
         if (file.exists()) {
             logger.debug("Repo exists, opening");
@@ -147,7 +112,7 @@ public class GitServiceImpl implements GitService {
         return git;
     }
 
-    private SshSessionFactory getSessionFactory() {
+    public SshSessionFactory getSessionFactory() {
         return new JschConfigSessionFactory() {
             @Override
             protected void configure(OpenSshConfig.Host host, Session session) {
