@@ -74,12 +74,9 @@ public class GitServiceImpl implements GitService {
                 .setCloneAllBranches( true )
                 .setBranch(REFS_PREFIX + branch)
                 .setDirectory(new File(PushRepoCommand.WORDS_REPO_DIR))
-                .setTransportConfigCallback(new TransportConfigCallback() {
-                    @Override
-                    public void configure(Transport transport) {
-                        SshTransport sshTransport = ( SshTransport )transport;
-                        sshTransport.setSshSessionFactory( getSessionFactory() );
-                    }
+                .setTransportConfigCallback((Transport transport) -> {
+                    SshTransport sshTransport = ( SshTransport )transport;
+                    sshTransport.setSshSessionFactory( getSessionFactory() );
                 });
         cloneCommand.call();
         logger.debug("Repo is cloned");
@@ -95,12 +92,9 @@ public class GitServiceImpl implements GitService {
             git = Git.open(file);
             git.checkout().setName(REFS_PREFIX + branch).call();
             git.pull()
-                    .setTransportConfigCallback(new TransportConfigCallback() {
-                        @Override
-                        public void configure(Transport transport) {
-                            SshTransport sshTransport = ( SshTransport )transport;
-                            sshTransport.setSshSessionFactory( getSessionFactory() );
-                        }
+                    .setTransportConfigCallback((Transport transport) -> {
+                        SshTransport sshTransport = ( SshTransport )transport;
+                        sshTransport.setSshSessionFactory( getSessionFactory() );
                     })
                     .call();
         } else {

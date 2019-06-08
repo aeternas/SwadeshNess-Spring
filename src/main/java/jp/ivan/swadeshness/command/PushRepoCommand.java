@@ -44,12 +44,9 @@ public class PushRepoCommand implements Callable<Void> {
 
         PushCommand pushCommand = git
                 .push()
-                .setTransportConfigCallback( new TransportConfigCallback() {
-                    @Override
-                    public void configure(Transport transport) {
-                        SshTransport sshTransport = ( SshTransport )transport;
-                        sshTransport.setSshSessionFactory( gitService.getSessionFactory() );
-                    }
+                .setTransportConfigCallback((Transport transport) -> {
+                    SshTransport sshTransport = ( SshTransport )transport;
+                    sshTransport.setSshSessionFactory( gitService.getSessionFactory() );
                 });
 
         pushCommand.call();
