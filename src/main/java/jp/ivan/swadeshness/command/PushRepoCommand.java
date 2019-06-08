@@ -2,6 +2,7 @@ package jp.ivan.swadeshness.command;
 
 import jp.ivan.swadeshness.service.GitServiceImpl;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
@@ -12,17 +13,17 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.concurrent.Callable;
 
-public class PushCommand implements Callable<Void> {
+public class PushRepoCommand implements Callable<Void> {
     public static final String WORDS_REPO_DIR = "words-list";
     private static final String WORDS_FILE = "/words";
 
 
-    private Logger logger = LoggerFactory.getLogger(PushCommand.class);
+    private Logger logger = LoggerFactory.getLogger(PushRepoCommand.class);
 
     private GitServiceImpl gitService;
     private String message;
 
-    public PushCommand(GitServiceImpl gitService) {
+    public PushRepoCommand(GitServiceImpl gitService) {
         this.gitService = gitService;
     }
 
@@ -41,7 +42,7 @@ public class PushCommand implements Callable<Void> {
         git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
         logger.debug("Commit made");
 
-        org.eclipse.jgit.api.PushCommand pushCommand = git
+        PushCommand pushCommand = git
                 .push()
                 .setTransportConfigCallback( new TransportConfigCallback() {
                     @Override
