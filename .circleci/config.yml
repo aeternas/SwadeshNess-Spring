@@ -22,7 +22,8 @@ aliases:
   - &containerize-push
     name: Containerize and Push
     command: |
-      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && \
+      echo $DOCKER_PASSWORD > docker_password && \
+      docker login -u $DOCKER_USERNAME --password-stdin < docker_passwd && rm docker_passwd && \
       docker build -t aeternas/swadeshness-spring:$CIRCLE_BRANCH . && \
       docker push aeternas/swadeshness-spring:$CIRCLE_BRANCH
 version: 2
