@@ -3,7 +3,7 @@ package jp.ivan.swadeshness.service;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import jp.ivan.swadeshness.models.PushTask;
+import jp.ivan.swadeshness.command.PushCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -58,7 +58,7 @@ public class GitServiceImpl implements GitService {
     public void pushAll(String message) throws ExecutionException, InterruptedException {
         ExecutorService executor = getTaskExecutor();
         logger.debug("Executor retrieved");
-        PushTask task = new PushTask(this);
+        PushCommand task = new PushCommand(this);
         task.setMessage(message);
         if (executor != null) {
             logger.debug("Submitting task");
@@ -73,7 +73,7 @@ public class GitServiceImpl implements GitService {
                 .setURI( GIT_URI )
                 .setCloneAllBranches( true )
                 .setBranch(REFS_PREFIX + branch)
-                .setDirectory(new File(PushTask.WORDS_REPO_DIR))
+                .setDirectory(new File(PushCommand.WORDS_REPO_DIR))
                 .setTransportConfigCallback(new TransportConfigCallback() {
                     @Override
                     public void configure(Transport transport) {
@@ -88,7 +88,7 @@ public class GitServiceImpl implements GitService {
     @Override
     public Git getRepo() throws IOException, GitAPIException {
         String branch = env.getProperty(WORDS_GIT_ENV);
-        File file = new File(PushTask.WORDS_REPO_DIR);
+        File file = new File(PushCommand.WORDS_REPO_DIR);
         Git git;
         if (file.exists()) {
             logger.debug("Repo exists, opening");
