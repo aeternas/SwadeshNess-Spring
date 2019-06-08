@@ -30,7 +30,7 @@ public class LanguagesUpdateController {
     ResponseEntity<String> index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         gitService.pushAll(word);
-        return new ResponseEntity<>("Words list is updated with word" + word, HttpStatus.OK);
+        return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
     }
 
     private ExecutorService getTaskExecutor() {
