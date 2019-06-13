@@ -16,10 +16,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 public class LanguagesUpdateController {
 
+    private Logger logger = LoggerFactory.getLogger(LanguagesUpdateController.class);
+    
     private GitService gitService;
     private ExecutorService executor;
 
@@ -30,11 +34,12 @@ public class LanguagesUpdateController {
     ResponseEntity<String> index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         gitService.pushAll(word);
-        return new ResponseEntity<>("Words list is updated with word" + word, HttpStatus.OK);
+        return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
     }
 
     private ExecutorService getTaskExecutor() {
         if (executor != null) {
+            logger.debug("Instantiated new executor");
             return executor;
         }
         executor = Executors.newSingleThreadExecutor();

@@ -3,7 +3,7 @@ package jp.ivan.swadeshness.service;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import jp.ivan.swadeshness.command.PushCommand;
+import jp.ivan.swadeshness.command.PushRepoCommand;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -58,7 +58,7 @@ public class GitServiceImpl implements GitService {
     public void pushAll(String message) throws ExecutionException, InterruptedException {
         ExecutorService executor = getTaskExecutor();
         logger.debug("Executor retrieved");
-        PushCommand task = new PushCommand(this);
+        PushRepoCommand task = new PushRepoCommand(this);
         task.setMessage(message);
         if (executor != null) {
             logger.debug("Submitting task");
@@ -73,13 +73,10 @@ public class GitServiceImpl implements GitService {
                 .setURI( GIT_URI )
                 .setCloneAllBranches( true )
                 .setBranch(REFS_PREFIX + branch)
-                .setDirectory(new File(PushCommand.WORDS_REPO_DIR))
-                .setTransportConfigCallback(new TransportConfigCallback() {
-                    @Override
-                    public void configure(Transport transport) {
-                        SshTransport sshTransport = ( SshTransport )transport;
-                        sshTransport.setSshSessionFactory( getSessionFactory() );
-                    }
+                .setDirectory(new File(PushRepoCommand.WORDS_REPO_DIR))
+                .setTransportConfigCallback((Transport transport) -> {
+                    SshTransport sshTransport = ( SshTransport )transport;
+                    sshTransport.setSshSessionFactory( getSessionFactory() );
                 });
         cloneCommand.call();
         logger.debug("Repo is cloned");
@@ -88,19 +85,16 @@ public class GitServiceImpl implements GitService {
     @Override
     public Git getRepo() throws IOException, GitAPIException {
         String branch = env.getProperty(WORDS_GIT_ENV);
-        File file = new File(PushCommand.WORDS_REPO_DIR);
+        File file = new File(PushRepoCommand.WORDS_REPO_DIR);
         Git git;
         if (file.exists()) {
             logger.debug("Repo exists, opening");
             git = Git.open(file);
             git.checkout().setName(REFS_PREFIX + branch).call();
             git.pull()
-                    .setTransportConfigCallback(new TransportConfigCallback() {
-                        @Override
-                        public void configure(Transport transport) {
-                            SshTransport sshTransport = ( SshTransport )transport;
-                            sshTransport.setSshSessionFactory( getSessionFactory() );
-                        }
+                    .setTransportConfigCallback((Transport transport) -> {
+                        SshTransport sshTransport = ( SshTransport )transport;
+                        sshTransport.setSshSessionFactory( getSessionFactory() );
                     })
                     .call();
         } else {
