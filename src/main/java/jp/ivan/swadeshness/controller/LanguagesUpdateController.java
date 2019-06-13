@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
 @RestController
 public class LanguagesUpdateController {
 
-    private Logger logger = LoggerFactory.getLogger(PushRepoCommand.class);
+    private Logger logger = LoggerFactory.getLogger(LanguageUpdateController.class);
     
     private GitService gitService;
     private ExecutorService executor;
