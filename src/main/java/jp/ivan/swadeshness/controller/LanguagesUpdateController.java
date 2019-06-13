@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 @RestController
 public class LanguagesUpdateController {
 
-    private Logger logger = LoggerFactory.getLogger(LanguageUpdateController.class);
+    private Logger logger = LoggerFactory.getLogger(LanguagesUpdateController.class);
     
     private GitService gitService;
     private ExecutorService executor;
