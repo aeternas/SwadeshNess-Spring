@@ -20,6 +20,8 @@ import java.util.concurrent.Executors;
 @RestController
 public class LanguagesUpdateController {
 
+    private Logger logger = LoggerFactory.getLogger(PushRepoCommand.class);
+    
     private GitService gitService;
     private ExecutorService executor;
 
@@ -35,6 +37,7 @@ public class LanguagesUpdateController {
 
     private ExecutorService getTaskExecutor() {
         if (executor != null) {
+            logger.debug("Instantiated new executor");
             return executor;
         }
         executor = Executors.newSingleThreadExecutor();
