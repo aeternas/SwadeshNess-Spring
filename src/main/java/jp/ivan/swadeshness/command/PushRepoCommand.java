@@ -34,6 +34,7 @@ public class PushRepoCommand implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         Git git = gitService.getRepo();
+	logger.debug("Starting writing to file");
         BufferedWriter out = new BufferedWriter(
                 new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
         out.newLine();
