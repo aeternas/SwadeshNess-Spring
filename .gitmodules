@@ -1,0 +1,4 @@
+[submodule "src/main/resources/languages/SwadeshNess-languages"]
+	path = src/main/resources/languages/SwadeshNess-languages
+	url = https://github.com/aeternas/SwadeshNess-languages.git
+	branch = development
