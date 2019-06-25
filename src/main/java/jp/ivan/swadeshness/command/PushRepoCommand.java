@@ -39,6 +39,7 @@ public class PushRepoCommand implements Callable<Void> {
                 new FileWriter(WORDS_REPO_DIR + WORDS_FILE, true));
         out.newLine();
         out.write(message);
+        logger.debug("File updated");
         out.close();
         git.commit().setAll(true).setMessage("Updated words list with word " + message).call();
         logger.debug("Commit made");
