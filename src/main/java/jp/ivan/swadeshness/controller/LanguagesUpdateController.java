@@ -42,6 +42,7 @@ public class LanguagesUpdateController {
             logger.debug("Instantiated new executor");
             return executor;
         }
+        logger.debug("Using existing executor");
         executor = Executors.newSingleThreadExecutor();
         return executor;
     }
