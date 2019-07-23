@@ -37,7 +37,7 @@ aliases:
       docker login -u $DOCKER_USERNAME --password-stdin < docker_passwd && rm docker_passwd && \
       docker build -t aeternas/swadeshness-spring:$CIRCLE_BRANCH . && \
       docker push aeternas/swadeshness-spring:$CIRCLE_BRANCH
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -58,3 +58,8 @@ jobs:
       - run: *make-executable
       - *setup-remote-docker
       - deploy: *containerize-push
+workflows:
+  version: 2.1
+  build-containerize-push:
+    jobs:
+      - build
