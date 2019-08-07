@@ -1,5 +1,5 @@
 aliases:
-  - &git_checkout
+  - &git-checkout
     name: Checkout
     command: |
       mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
@@ -25,7 +25,7 @@ aliases:
   - &setup-remote-docker
     setup_remote_docker:
       docker_layer_caching: true
-  - &update_submodules
+  - &update-submodules
     name: Update submodules
     command: |
       git submodule init && \
@@ -47,8 +47,8 @@ jobs:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
     steps:
-      - run: *git_checkout
-      - run: *update_submodules
+      - run: *git-checkout
+      - run: *update-submodules
       - restore_cache: *restore-cache
       - run: *gradle-deps
       - save_cache: *save-cache
