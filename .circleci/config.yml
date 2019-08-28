@@ -37,9 +37,10 @@ aliases:
       docker login -u $DOCKER_USERNAME --password-stdin < docker_passwd && rm docker_passwd && \
       docker build -t aeternas/swadeshness-spring:$CIRCLE_BRANCH . && \
       docker push aeternas/swadeshness-spring:$CIRCLE_BRANCH
-      if [[ $CIRCLE_BRANCH == "master" ]]; then \
-                                      docker tag aeternas/swadeshness-spring:master aeternas/swadeshness-spring:latest && \
-                                      docker push aeternas/swadeshness-spring:latest; fi
+      if [[ $CIRCLE_BRANCH == "master" ]]; then
+        docker tag aeternas/swadeshness-spring:master aeternas/swadeshness-spring:latest && \
+        docker push aeternas/swadeshness-spring:latest
+      fi
 version: 2.1
 jobs:
   build:
