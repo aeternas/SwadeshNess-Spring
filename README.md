@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/aeternas/SwadeshNess-Spring.svg?style=svg)](https://circleci.com/gh/aeternas/SwadeshNess-Spring)
-
 Build Status
 ------------
 
