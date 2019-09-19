@@ -5,6 +5,9 @@ aliases:
       mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       git clone --depth 1 -b $CIRCLE_BRANCH $CIRCLE_REPOSITORY_URL ./ && \
       git checkout $CIRCLE_SHA1
+  - &environment
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
   - &restore-cache
     keys:
     - v1-dependencies-{{ checksum "build.gradle" }}
@@ -47,9 +50,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
-    environment:
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
+    environment: *environment
     steps:
       - run: *git-checkout
       - run: *update-submodules
