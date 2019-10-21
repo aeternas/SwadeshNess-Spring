@@ -27,7 +27,7 @@ aliases:
     command: ./gradlew bootJar
   - &setup-remote-docker
     setup_remote_docker:
-      docker_layer_caching: true
+      docker_layer_caching: false
   - &update-submodules
     name: Update submodules
     command: |
