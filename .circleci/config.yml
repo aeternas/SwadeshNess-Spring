@@ -4,7 +4,7 @@ aliases:
     command: |
       mkdir -p ~/.ssh && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       git clone --depth 1 -b $CIRCLE_BRANCH $CIRCLE_REPOSITORY_URL ./ && \
-      git checkout $CIRCLE_SHA1
+      git reset --hard $CIRCLE_SHA1
   - &environment
       JVM_OPTS: -Xmx3200m
       TERM: dumb
