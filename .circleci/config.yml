@@ -46,6 +46,10 @@ aliases:
         docker tag aeternas/swadeshness-spring:master aeternas/swadeshness-spring:latest && \
         docker push aeternas/swadeshness-spring:latest
       fi
+
+# -------------------------
+#        JOBS
+# -------------------------
 version: 2.1
 jobs:
   build:
