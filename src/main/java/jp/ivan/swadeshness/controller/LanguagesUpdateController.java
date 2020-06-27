@@ -37,6 +37,15 @@ public class LanguagesUpdateController {
         return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/words")
+    ResponseEntity<String> index(@PathVariable String[] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+        gitService = getGitService();
+        for (String word : words) {
+            gitService.pushAll(word);
+        }
+        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.OK);
+    }
+
     private ExecutorService getTaskExecutor() {
         if (executor != null) {
             logger.debug("Instantiated new executor");
