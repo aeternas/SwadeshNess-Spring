@@ -3,11 +3,13 @@ package jp.ivan.swadeshness.controller;
 import jp.ivan.swadeshness.service.GitService;
 import jp.ivan.swadeshness.service.GitServiceImpl;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -35,6 +37,15 @@ public class LanguagesUpdateController {
         gitService = getGitService();
         gitService.pushAll(word);
         return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/words/{words}")
+    ResponseEntity<String> index(@RequestBody String @NotNull [] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+        gitService = getGitService();
+        for (String word : words) {
+            gitService.pushAll(word);
+        }
+        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.OK);
     }
 
     private ExecutorService getTaskExecutor() {
