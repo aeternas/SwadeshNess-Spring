@@ -39,8 +39,8 @@ public class LanguagesUpdateController {
         return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/words")
-    ResponseEntity<String> index(@RequestBody @NotNull String[] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+    @PutMapping(value = "/words/{words}")
+    ResponseEntity<String> index(@RequestBody String @NotNull [] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         for (String word : words) {
             gitService.pushAll(word);
