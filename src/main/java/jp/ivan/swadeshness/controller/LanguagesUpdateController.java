@@ -46,7 +46,7 @@ public class LanguagesUpdateController {
         for (String word : words) {
             gitService.pushAll(word);
         }
-        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.OK);
+        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.CREATED);
     }
 
     private ExecutorService getTaskExecutor() {

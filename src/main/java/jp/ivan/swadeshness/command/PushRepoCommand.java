@@ -3,7 +3,6 @@ package jp.ivan.swadeshness.command;
 import jp.ivan.swadeshness.service.GitServiceImpl;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
 import org.slf4j.Logger;
