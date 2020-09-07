@@ -3,7 +3,6 @@ package jp.ivan.swadeshness.controller;
 import jp.ivan.swadeshness.service.GitService;
 import jp.ivan.swadeshness.service.GitServiceImpl;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -20,6 +19,8 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.validation.constraints.NotNull;
 
 @RestController
 public class LanguagesUpdateController {
@@ -45,7 +46,7 @@ public class LanguagesUpdateController {
         for (String word : words) {
             gitService.pushAll(word);
         }
-        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.OK);
+        return new ResponseEntity<>("Words list is updated with words: " + words, HttpStatus.CREATED);
     }
 
     private ExecutorService getTaskExecutor() {
