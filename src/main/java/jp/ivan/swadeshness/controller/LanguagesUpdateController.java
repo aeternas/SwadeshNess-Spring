@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -41,6 +38,7 @@ public class LanguagesUpdateController {
     }
 
     @PutMapping(value = "/words/{words}")
+    @ResponseStatus(HttpStatus.CREATED)
     ResponseEntity<String> index(@RequestBody String @NotNull [] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         for (String word : words) {
