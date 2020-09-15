@@ -31,15 +31,15 @@ public class LanguagesUpdateController {
     private Environment env;
 
     @PutMapping(value = "/words/{word}")
-    ResponseEntity<String> index(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+    ResponseEntity<String> pushWord(@PathVariable String word) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         gitService.pushAll(word);
         return new ResponseEntity<>("Words list is updated with word " + word, HttpStatus.OK);
     }
 
-    @PutMapping(value = "/words/{words}")
+    @PutMapping(value = "/words/")
     @ResponseStatus(HttpStatus.CREATED)
-    ResponseEntity<String> index(@RequestBody String @NotNull [] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
+    ResponseEntity<String> pushWords(@RequestBody String @NotNull [] words) throws GitAPIException, IOException, ExecutionException, InterruptedException {
         gitService = getGitService();
         for (String word : words) {
             gitService.pushAll(word);
