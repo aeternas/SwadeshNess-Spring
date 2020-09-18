@@ -49,10 +49,10 @@ public class LanguagesUpdateController {
 
     private ExecutorService getTaskExecutor() {
         if (executor != null) {
-            logger.debug("Instantiated new executor");
+            logger.debug("Using existing executor");
             return executor;
         }
-        logger.debug("Using existing executor");
+        logger.debug("Instantiated new executor");
         executor = Executors.newSingleThreadExecutor();
         return executor;
     }
