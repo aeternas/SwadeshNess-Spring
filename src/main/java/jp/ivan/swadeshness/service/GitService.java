@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 public interface GitService {
-    void setEnv(Environment env);
     void setExecutor(ExecutorService executor);
     Git getRepo() throws IOException, GitAPIException;
     SshSessionFactory getSessionFactory();
