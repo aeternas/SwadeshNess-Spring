@@ -54,6 +54,7 @@ version: 2.1
 jobs:
   build-deploy:
     docker: *docker-openjdk-worker
+    resource_class: small
     working_directory: ~/repo
     environment: *environment
     steps:
