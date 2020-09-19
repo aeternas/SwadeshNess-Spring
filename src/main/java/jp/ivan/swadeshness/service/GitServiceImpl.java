@@ -4,14 +4,15 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import jp.ivan.swadeshness.command.PushRepoCommand;
+import lombok.Setter;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.util.FS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -47,12 +48,13 @@ public class GitServiceImpl implements GitService {
         return executor;
     }
 
-    @Override
+
+    private Environment env;
+
+    @Autowired
     public void setEnv(Environment env) {
         this.env = env;
     }
-
-    private Environment env;
 
     @Override
     public void pushAll(String message) throws ExecutionException, InterruptedException {
