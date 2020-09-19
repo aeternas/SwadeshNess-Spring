@@ -48,9 +48,13 @@ public class GitServiceImpl implements GitService {
         return executor;
     }
 
-    @Autowired
-    @Setter
+
     private Environment env;
+
+    @Autowired
+    public void setEnv(Environment env) {
+        this.env = env;
+    }
 
     @Override
     public void pushAll(String message) throws ExecutionException, InterruptedException {
