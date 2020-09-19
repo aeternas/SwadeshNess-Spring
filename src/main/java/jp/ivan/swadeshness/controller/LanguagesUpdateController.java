@@ -63,7 +63,7 @@ public class LanguagesUpdateController {
         }
         gitService = new GitServiceImpl();
         gitService.setExecutor(getTaskExecutor());
-//        gitService.setEnv(env);
+        gitService.setEnv(env);
         return gitService;
     }
 }
