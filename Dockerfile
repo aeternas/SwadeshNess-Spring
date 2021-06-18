@@ -1,4 +1,4 @@
-FROM openjdk:9-alpine
+FROM openjdk:8-alpine
 RUN apk --no-cache add curl
 WORKDIR /home/circleci/repo/
 COPY build/libs/swadeshness-0.0.1-SNAPSHOT.jar .
